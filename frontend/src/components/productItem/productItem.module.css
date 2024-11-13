@@ -1,0 +1,87 @@
+.productItem{
+    width: 220px;
+    /* background-color: grey; */
+    height: 260px;
+    border: 1px solid var(--border_color);
+    border-radius: 10px;
+    overflow: hidden;
+
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+
+}
+.imgWrapper{
+    height: 150px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--border_color);
+
+}
+.productImg{
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+.productInfo{
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background-color: white;
+    height: 110px;
+    justify-content: center;
+    border-bottom: 1px solid var(--border_color);
+    
+}
+.productName p{
+    font-size: 13px;
+}
+.name{
+    font-weight: bold;
+}
+.desc{
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* number of lines to show */
+            line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+.productPrice{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.productPrice h2{
+    font-size: 1rem;
+}
+.productPrice del{
+    color: red;
+    font-size: 0.9rem;
+}
+.progressBox{
+    height: 50px;
+    display: flex;
+    
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 12px;
+}
+.progressBar{
+    flex: 1;
+    height: 8px;
+    border-radius: 12px;
+    background-color: var(--border_color);
+}
+.progress{
+    width: 90%;
+    background-color: black;
+    background-color: var(--main_color);
+    height: 100%;
+    border-radius: 6px;
+}
+.progressBox p{
+    font-size: 10px;
+}

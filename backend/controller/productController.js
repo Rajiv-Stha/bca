@@ -98,6 +98,21 @@ const searchProductByUser = async (req, res, next) => {
     next(error);
   }
 };
+
+const getProductByUserId = async (req, res,next) => {
+  const { userId } = req.params; // Extract userId from URL params
+
+  try {
+    // Fetch products owned by the specified user
+    const products = await productModel.find({ owner: userId }).populate("owner", "name email"); // Populate owner details if needed
+
+    res.status(200).json(products);
+  } catch (error) {
+    next(error)
+  }
+};
+
+
 module.exports = {
   createProduct,
   reduceQuantityOfProduct,
@@ -105,4 +120,5 @@ module.exports = {
   updateProduct,
   deleteProduct,
   searchProductByUser,
+  getProductByUserId
 };

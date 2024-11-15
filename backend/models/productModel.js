@@ -36,11 +36,7 @@ const productSchema = mongoose.Schema(
     status: {
       type: String,
       enums: ["pending", "approved", "rejected"],
-    },
-    gender: {
-      type: String,
-      enums: ["male", "female", "other"],
-      required: true,
+      default: "pending",
     },
   },
   { timestamps: true }

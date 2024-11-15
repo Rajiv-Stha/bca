@@ -62,6 +62,7 @@ export const getAllProductByStatusApi = (statusArr: ("pending" | "approved")[]) 
   export const getSingleProductById=(productId:string)=>axiosInstance.get(`/product?_id=${productId}`)
 export const getProductsbyCategoryApi=(category:string)=>axiosInstance.get(`/product?category=${category}`)
 export const searchProductByInputApi =(search:string)=>axiosInstance.get(`/product/search?search=${search}`)
+export const getProductByUserId = (userId:string)=>axiosInstance.get(`/product/user/${userId}`)
 
 
 
@@ -82,6 +83,7 @@ export const getCommentOfProductApi = (productId:string)=>axiosInstance.get(`/co
 export const createTransactionApi=(data:transactionPayload)=>axiosInstance.post("/transaction/create",data)
 export const getTransactionForBuyerApi=(userId:true)=>axiosInstance.get(`/transaction/user?userId=${userId}&buyer=true`)
 export const getTransactionForSellerApi=(userId:true)=>axiosInstance.get(`/transaction/user?userId=${userId}&seller=true`)
+export const getTransactionOfUserApi=(userId:true)=>axiosInstance.get(`/transaction/myTransaction/${userId}`)
 
 //checkout route
 export const handleCheckoutApi=(productId:string, userId:string, quantity:number, totalPrice:number,data:transactionPayload)=>axiosInstance.post("/payment/checkout/",{

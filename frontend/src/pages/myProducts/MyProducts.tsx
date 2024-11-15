@@ -1,11 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { Button } from "@chakra-ui/react"
-import { Input } from "@chakra-ui/react"
-import { FormLabel } from "@chakra-ui/react"
-import { Table, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react"
-import { Badge } from "@chakra-ui/react"
+import { useState, useEffect, useContext } from 'react'
+import { Button, Input, FormLabel, Table, Tbody, Td, Th, Thead, Tr, Badge, Select } from "@chakra-ui/react"
 import { EditIcon, DeleteIcon } from '@chakra-ui/icons'
 import {
   Modal,
@@ -17,43 +13,40 @@ import {
   ModalCloseButton,
   useDisclosure,
 } from "@chakra-ui/react"
-import { Select } from "@chakra-ui/react"
+import { getProductByUserId } from '../../utils/api' // Adjust the import path
+import { ThriftContext } from '../../context/Context' // Adjust the import path
+import { UserType } from '../../utils/Type'
 
-// Types for the product and the form data
-interface Product {
-  id: number;
-  name: string;
-  price: number;
-  status: 'pending' | 'approved';
-  description: string;
-  category: string;
-}
 
-interface ProductFormProps {
-  product: Product | null;
-  onSubmit: (updatedProduct: Product) => void;
-}
-
-const initialProducts: Product[] = [
-  { id: 1, name: 'Vintage Chair', price: 50, status: 'pending', description: 'A beautiful vintage chair', category: 'Furniture' },
-  { id: 2, name: 'Antique Lamp', price: 75, status: 'approved', description: 'An elegant antique lamp', category: 'Lighting' },
-  { id: 3, name: 'Retro Radio', price: 100, status: 'pending', description: 'A classic retro radio', category: 'Electronics' },
-]
-
-const categories: string[] = ['Furniture', 'Lighting', 'Electronics', 'Clothing', 'Books', 'Other']
+import { ProductType } from '../../utils/Type'
 
 export default function MyProducts() {
-  const [products, setProducts] = useState<Product[]>(initialProducts)
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null)
+  const [products, setProducts] = useState<ProductType[]>([])
+  const [editingProduct, setEditingProduct] = useState<ProductType | null>(null)
   const { isOpen, onOpen, onClose } = useDisclosure()
 
-  const handleDelete = (id: number) => {
-    setProducts(products.filter(product => product.id !== id))
+  const { state: { user } } = useContext(ThriftContext)
+
+  useEffect(() => {
+    if (user && user._id) {
+      // Fetch user's transactions using API
+      getProductByUserId(user._id)
+        .then((response) => {
+          setProducts(response.data); // Assuming response.data contains the list of products
+        })
+        .catch((err) => {
+          console.error("Error fetching transactions:", err);
+        });
+    }
+  }, [user]);
+
+  const handleDelete = (id: string) => {
+    setProducts(products.filter(product => product._id !== id))
   }
 
-  const handleUpdate = (updatedProduct: Product) => {
+  const handleUpdate = (updatedProduct: ProductType) => {
     setProducts(products.map(product => 
-      product.id === updatedProduct.id ? updatedProduct : product
+      product._id === updatedProduct._id ? updatedProduct : product
     ))
     setEditingProduct(null)
     onClose()
@@ -73,14 +66,16 @@ export default function MyProducts() {
           </Tr>
         </Thead>
         <Tbody>
-          {products.map((product) => (
-            <Tr key={product.id}>
+          {products?.map((product) => (
+            <Tr key={product._id}>
               <Td>{product.name}</Td>
               <Td>{product.category}</Td>
               <Td>NRs. {product.price}</Td>
               <Td>
-                <Badge colorScheme={product.status === 'approved' ? 'green' : 'orange'}>
-                  {product.status}
+                <Badge colorScheme={
+                  product.status=="approved"?"green":product.status=="pending"?"yellow":"red"
+                }>
+                  {product.status} {/* Placeholder as product.status is not defined in ProductType */}
                 </Badge>
               </Td>
               <Td>
@@ -88,7 +83,7 @@ export default function MyProducts() {
                   <Button size="sm" onClick={() => { setEditingProduct(product); onOpen() }}>
                     <EditIcon />
                   </Button>
-                  <Button colorScheme="red" size="sm" onClick={() => handleDelete(product.id)}>
+                  <Button colorScheme="red" size="sm" onClick={() => handleDelete(product._id)}>
                     <DeleteIcon />
                   </Button>
                 </div>
@@ -114,15 +109,8 @@ export default function MyProducts() {
   )
 }
 
-function ProductForm({ product, onSubmit }: ProductFormProps) {
-  const [formData, setFormData] = useState<Product>(product || {
-    id: 0,
-    name: '',
-    price: 0,
-    status: 'pending',
-    description: '',
-    category: ''
-  })
+function ProductForm({ product, onSubmit }: { product: ProductType; onSubmit: (updatedProduct: ProductType) => void }) {
+  const [formData, setFormData] = useState<ProductType>(product)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -153,7 +141,7 @@ function ProductForm({ product, onSubmit }: ProductFormProps) {
       <div>
         <FormLabel htmlFor="category">Category</FormLabel>
         <Select id="category" name="category" value={formData.category} onChange={handleCategoryChange} placeholder="Select category">
-          {categories.map((category) => (
+          {['Furniture', 'Lighting', 'Electronics', 'Clothing', 'Books', 'Other'].map((category) => (
             <option key={category} value={category}>
               {category}
             </option>
@@ -165,8 +153,8 @@ function ProductForm({ product, onSubmit }: ProductFormProps) {
         <Input id="price" name="price" type="number" value={formData.price} onChange={handleChange} required />
       </div>
       <div>
-        <FormLabel htmlFor="description">Description</FormLabel>
-        <Input id="description" name="description" value={formData.description} onChange={handleChange} required />
+        <FormLabel htmlFor="desc">Description</FormLabel>
+        <Input id="desc" name="desc" value={formData.desc} onChange={handleChange} required />
       </div>
       <Button colorScheme="blue" type="submit">
         Update Product

@@ -6,8 +6,8 @@ export type ProductType={
     price:number,
     category:string,
     quantity:number,
+    status: "pending"|"approved"|"rejected"
     _id:string,
-    gender:string,
 }
 export type UserType={
     username:string,

@@ -27,7 +27,6 @@ const Upload = () => {
     price:"",
     category:"",
     quantity:0,
-    gender:"",
   })
   const {upload}  = useUploadImage()
   const {alert}  = useAlert()
@@ -105,7 +104,6 @@ const Upload = () => {
         image:"",
         price:"",
         quantity:0,
-        gender:"",
         category:""
        })
       }
@@ -118,13 +116,7 @@ const Upload = () => {
     }
 
   }
-  const handleGenderChange = (event:ChangeEvent<HTMLSelectElement>)=>{
-    const {name, value} = event.target
-    setUploadData(prev=>{
-      return {...prev, [name]:value}
-    })
-
-  }
+ 
 
   const handleFileChange = (e:ChangeEvent<HTMLInputElement>)=>{
     if(e.target.files){
@@ -175,16 +167,7 @@ const Upload = () => {
           <label htmlFor="price">Price</label>
           <input type="number" id="price" placeholder="Enter price" onChange={handleInputChange} name="price" value={uploadData.price} />
           </div>
-          <div className={styles.genderInput}>
-
-          <label htmlFor="price">Gender</label>
-          <select name="gender" id="gender" onChange={handleGenderChange}>
-            <option className={styles.selectOption} value="choose" selected disabled>gender</option>
-            <option className={styles.selectOption} value="male">Male</option>
-            <option className={styles.selectOption} value="female">Female</option>
-            <option className={styles.selectOption} value="other">Other</option>
-          </select>
-          </div>
+        
      
           
           

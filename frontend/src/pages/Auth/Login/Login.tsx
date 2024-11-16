@@ -60,7 +60,8 @@ const Login = () => {
   }
   return (
     <div className={styles.AuthWrapper}>
-              <img  onClick={()=>navigate("/")} src="/images/logo.png" className={styles.logo}/>
+              {/* <img  onClick={()=>navigate("/")} src="/images/logo.png" className={styles.logo}/> */}
+              <h1 onClick={()=>navigate("/")} className={styles.logo}>Logo</h1>
            
 
       <div className={styles.login_main_box}>

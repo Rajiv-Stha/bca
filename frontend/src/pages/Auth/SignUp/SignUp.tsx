@@ -81,7 +81,8 @@ const Signup = () => {
 
   return (
     <div className={styles.AuthWrapper}>
-      <img onClick={() => navigate("/")} src="/images/logo.png" className={styles.logo} />
+      {/* <img onClick={() => navigate("/")} src="/images/logo.png" className={styles.logo} /> */}
+      <h1 onClick={()=>navigate("/")} className={styles.logo}>logo</h1>
       <div className={styles.login_main_box}>
         <div className={styles.login_welcome_text}></div>
         <div className={styles.sign_in_with_email_division}>

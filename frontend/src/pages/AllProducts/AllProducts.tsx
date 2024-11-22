@@ -9,11 +9,16 @@ import ProductItem from "../../components/productItem/ProductItem"
 
 import SearchModal from "../../layouts/modal/SeachModal/SearchModal"
 import Footer from "../../components/Footer/Footer"
+import { useLocation } from 'react-router-dom';
+
 
 const AllProducts = () => {
 
   const [ currentCategory,setCurrentCategory] =useState("All");
   const [productItem,setProductItem] = useState([]);
+  const location = useLocation(); // Get the current URL location
+  const searchParams = new URLSearchParams(location.search); // Parse query parameters
+  const category = searchParams.get('category'); // Extract 'category' value
 
  
   useEffect(()=>{
@@ -22,7 +27,12 @@ const AllProducts = () => {
     
   },[currentCategory])
 
- 
+ useEffect(()=>{
+  if(category){
+
+    setCurrentCategory(category)
+  }
+ },[category])
 
 
   const fetchProductsByCategory=async(category:string)=>{

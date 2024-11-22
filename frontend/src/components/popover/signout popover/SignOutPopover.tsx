@@ -48,6 +48,8 @@ import { useAlert } from '../../../hooks/useAlert'
       {/* <PopoverCloseButton /> */}
       <div className={styles.popBox}>
        <Link to={"/profile"}>Visit profile</Link>
+       <Link to={"/myproducts"}>My products</Link>
+       <Link to={"transactions"}>Transactions</Link>
         <p>{user.email}</p>
         <p>{user.username}</p>
         <button className={styles.logoutButton} onClick={handleLogout}>Logout</button>

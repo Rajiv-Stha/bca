@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { getAllProductApi } from "../../utils/api";
+import { allCategoryApi, getAllProductApi, TupdateProuductPayload, updateProductById } from "../../utils/api";
 import {
   Table,
   Tbody,
@@ -26,6 +26,7 @@ import {
 } from "@chakra-ui/react";
 import { EditIcon, DeleteIcon } from "@chakra-ui/icons";
 import axiosInstance from "../../utils/axios";
+import Navbar from "../../components/Navbar/Navbar";
 
 // Types for the product and the form data
 interface Product {
@@ -101,15 +102,7 @@ export default function AdminDashboard() {
   };
   
 
-  const handleUpdate = (updatedProduct: Product) => {
-    setAllProducts(
-      allProducts.map((product) =>
-        product._id === updatedProduct._id ? updatedProduct : product
-      )
-    );
-    setEditingProduct(null);
-    onClose();
-  };
+ 
 
   const fetchProducts = async () => {
     try {
@@ -124,7 +117,9 @@ export default function AdminDashboard() {
     }
   };
 
-  return (
+  return (<>
+  <Navbar/>
+ 
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">
         Second Hand Store Admin Dashboard
@@ -187,85 +182,135 @@ export default function AdminDashboard() {
         </Tbody>
       </Table>
 
-      {/* <Modal isOpen={isOpen} onClose={onClose}>
+      <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Edit Product</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             {editingProduct && (
-              <ProductForm product={editingProduct} onSubmit={handleUpdate} />
+              <ProductForm product={editingProduct}  onSuccess={()=>{onClose() ; fetchProducts()}} />
             )}
           </ModalBody>
         </ModalContent>
-      </Modal> */}
+      </Modal>
     </div>
+    </>
   );
 }
 
-// function ProductForm({ product, onSubmit }: ProductFormProps) {
-//   const [formData, setFormData] = useState<Product>(product || {
-//     _id: "",
-//     name: '',
-//     price: "",
-//     status: 'pending',
-//     category: '',
-//     createdAt: '',
-//     desc:"",
-//     gender: '',
-//     image: '',
-//     owner: '',
-//     quantity: '',
-//       updatedAt: '',
-//   })
+function ProductForm({ 
+  product, 
+  onSuccess
+}: { 
+  product: TupdateProuductPayload; 
+  onSuccess:()=>void
 
-//   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-//     const { name, value } = e.target
-//     setFormData(prevData => ({
-//       ...prevData,
-//       [name]: name === 'price' ? parseFloat(value) : value
-//     }))
-//   }
+}) {
+  const [formData, setFormData] = useState<TupdateProuductPayload>(product);
+  const [allCategory, setAllCategory] = useState([])
+  useEffect(()=>{
+    categoryFetching()
+  },[])
+  const categoryFetching = async()=>{
+    try {
+      const {data, status} = await allCategoryApi()
+      if(status===200){
+        setAllCategory(data.message)
+      }
+    } catch (error:any) {
+      console.log(error.message)
+    }
+  }
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
 
-//   const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-//     setFormData(prevData => ({
-//       ...prevData,
-//       category: e.target.value
-//     }))
-//   }
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: name === 'quantity' ? parseInt(value, 10) : value, // Parse `quantity` as number
+    }));
+  };
 
-//   const handleSubmit = (e: React.FormEvent) => {
-//     e.preventDefault()
-//     onSubmit(formData)
-//   }
+  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      category: e.target.value,
+    }));
+  };
 
-//   return (
-//     <form onSubmit={handleSubmit}>
-//       <FormControl mb={4}>
-//         <FormLabel htmlFor="name">Name</FormLabel>
-//         <Input id="name" name="name" value={formData.name} onChange={handleChange} required />
-//       </FormControl>
-//       <FormControl mb={4}>
-//         <FormLabel htmlFor="category">Category</FormLabel>
-//         <Select id="category" name="category" value={formData.category} onChange={handleCategoryChange} required>
-//           {categories.map((category) => (
-//             <option key={category} value={category}>
-//               {category}
-//             </option>
-//           ))}
-//         </Select>
-//       </FormControl>
-//       <FormControl mb={4}>
-//         <FormLabel htmlFor="price">Price</FormLabel>
-//         <Input id="price" name="price" type="number" value={formData.price} onChange={handleChange} required />
-//       </FormControl>
-//       <FormControl mb={4}>
-//         <FormLabel htmlFor="description">Description</FormLabel>
-//         <Input id="description" name="description" value={formData.description} onChange={handleChange} required />
-//       </FormControl>
-//       <Button type="submit" colorScheme="blue">
-//         Update Product
-//       </Button>
-//     </form>
-//   )
-// }
+  const handleSubmit = async(e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+    await  updateProductById(product._id as string, formData)
+    onSuccess()
+    } catch (error) {
+      
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <FormLabel htmlFor="name">Name</FormLabel>
+        <Input 
+          id="name" 
+          name="name" 
+          value={formData.name} 
+          onChange={handleChange} 
+          required 
+        />
+      </div>
+      <div>
+        <FormLabel htmlFor="category">Category</FormLabel>
+        <Select 
+          id="category" 
+          name="category" 
+          value={formData.category} 
+          onChange={handleCategoryChange} 
+          placeholder="Select category"
+        >
+          {allCategory.map((category) => (
+            <option key={category} value={category.categoryName}>
+              {category.categoryName}
+            </option>
+          ))}
+        </Select>
+      </div>
+      <div>
+        <FormLabel htmlFor="price">Price</FormLabel>
+        <Input 
+          id="price" 
+          name="price" 
+          type="text" 
+          value={formData.price} 
+          onChange={handleChange} 
+          required 
+        />
+      </div>
+      <div>
+        <FormLabel htmlFor="desc">Description</FormLabel>
+        <Input 
+          id="desc" 
+          name="desc" 
+          value={formData.desc} 
+          onChange={handleChange} 
+          required 
+        />
+      </div>
+      <div>
+        <FormLabel htmlFor="quantity">Quantity</FormLabel>
+        <Input 
+          id="quantity" 
+          name="quantity" 
+          type="number" 
+          value={formData.quantity} 
+          onChange={handleChange} 
+          required 
+        />
+      </div>
+      <Button colorScheme="blue" type="submit">
+        Update Product
+      </Button>
+    </form>
+  );
+}

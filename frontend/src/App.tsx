@@ -64,7 +64,7 @@ function App() {
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/admin" element={<AdminDashboard/>} />
-          <Route path="/myproducts/:user_id" element={<MyProducts/>} />
+          <Route path="/myproducts" element={<MyProducts/>} />
           <Route path="/success" element={<PaymentSuccess/>}/>
           <Route path="/failure" element={<PaymentFailure/>}/>
         </Routes>

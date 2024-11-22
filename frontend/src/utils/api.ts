@@ -54,7 +54,16 @@ export const allCategoryApi = ()=>axiosInstance.get("/category")
 
 
 
+
 // product routes
+export type TupdateProuductPayload={
+    name:string,
+    desc:string,
+    image:string,
+    price:string,
+    category:string,
+    quantity:number
+}
 export const AddProductApi = (data:productPayloadType)=>axiosInstance.post("/product/create",data)
 export const getAllProductApi = ()=>axiosInstance.get("/product");
 export const getAllProductByStatusApi = (statusArr: ("pending" | "approved")[]) => 
@@ -63,6 +72,7 @@ export const getAllProductByStatusApi = (statusArr: ("pending" | "approved")[]) 
 export const getProductsbyCategoryApi=(category:string)=>axiosInstance.get(`/product?category=${category}`)
 export const searchProductByInputApi =(search:string)=>axiosInstance.get(`/product/search?search=${search}`)
 export const getProductByUserId = (userId:string)=>axiosInstance.get(`/product/user/${userId}`)
+export const updateProductById = (productId:string,data:TupdateProuductPayload)=>axiosInstance.put(`/product/${productId}`,data)
 
 
 

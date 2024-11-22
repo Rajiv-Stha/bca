@@ -12,7 +12,7 @@ type CategoryItemProps={
 
 const CategoryItem:React.FC<CategoryItemProps> = ({product}) => {
   return (
-    <Link to={`/allProducts`} state={{category:product.categoryName}} className={styles.CategoryItem}>
+    <Link to={`/allProducts?category=${product.categoryName}`} state={{category:product.categoryName}} className={styles.CategoryItem}>
       <div className={styles.imgWrapper}>
         <img src={product.image} alt="categoryItem" />
       </div>

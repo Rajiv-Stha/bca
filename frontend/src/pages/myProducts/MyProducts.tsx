@@ -13,12 +13,14 @@ import {
   ModalCloseButton,
   useDisclosure,
 } from "@chakra-ui/react"
-import { getProductByUserId } from '../../utils/api' // Adjust the import path
+import { allCategoryApi, getProductByUserId, updateProductById } from '../../utils/api' // Adjust the import path
 import { ThriftContext } from '../../context/Context' // Adjust the import path
 import { UserType } from '../../utils/Type'
+import { TupdateProuductPayload } from '../../utils/api'
 
 
 import { ProductType } from '../../utils/Type'
+import Navbar from '../../components/Navbar/Navbar'
 
 export default function MyProducts() {
   const [products, setProducts] = useState<ProductType[]>([])
@@ -26,33 +28,32 @@ export default function MyProducts() {
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   const { state: { user } } = useContext(ThriftContext)
-
+const fetchProduct = ()=>{
+  if (user && user._id) {
+    // Fetch user's transactions using API
+    getProductByUserId(user._id)
+      .then((response) => {
+        setProducts(response.data); // Assuming response.data contains the list of products
+      })
+      .catch((err) => {
+        console.error("Error fetching transactions:", err);
+      });
+  }
+}
   useEffect(() => {
-    if (user && user._id) {
-      // Fetch user's transactions using API
-      getProductByUserId(user._id)
-        .then((response) => {
-          setProducts(response.data); // Assuming response.data contains the list of products
-        })
-        .catch((err) => {
-          console.error("Error fetching transactions:", err);
-        });
-    }
+   fetchProduct()
   }, [user]);
 
   const handleDelete = (id: string) => {
     setProducts(products.filter(product => product._id !== id))
   }
 
-  const handleUpdate = (updatedProduct: ProductType) => {
-    setProducts(products.map(product => 
-      product._id === updatedProduct._id ? updatedProduct : product
-    ))
-    setEditingProduct(null)
-    onClose()
-  }
+  
 
   return (
+    <>
+   
+      <Navbar/>
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">My Products</h1>
       <Table variant="simple">
@@ -100,65 +101,130 @@ export default function MyProducts() {
           <ModalCloseButton />
           <ModalBody>
             {editingProduct && (
-              <ProductForm product={editingProduct} onSubmit={handleUpdate} />
+              <ProductForm product={editingProduct}   onSuccess={()=>{onClose() ; fetchProduct()}}/>
             )}
           </ModalBody>
         </ModalContent>
       </Modal>
     </div>
+    </>
   )
 }
 
-function ProductForm({ product, onSubmit }: { product: ProductType; onSubmit: (updatedProduct: ProductType) => void }) {
-  const [formData, setFormData] = useState<ProductType>(product)
+function ProductForm({ 
+  product, 
+  onSuccess
+}: { 
+  product: TupdateProuductPayload; 
+  onSuccess:()=>void
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setFormData(prevData => ({
-      ...prevData,
-      [name]: name === 'price' ? parseFloat(value) : value
-    }))
+}) {
+  const [formData, setFormData] = useState<TupdateProuductPayload>(product);
+  const [allCategory, setAllCategory] = useState([])
+  useEffect(()=>{
+    categoryFetching()
+  },[])
+  const categoryFetching = async()=>{
+    try {
+      const {data, status} = await allCategoryApi()
+      if(status===200){
+        setAllCategory(data.message)
+      }
+    } catch (error:any) {
+      console.log(error.message)
+    }
   }
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: name === 'quantity' ? parseInt(value, 10) : value, // Parse `quantity` as number
+    }));
+  };
 
   const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setFormData(prevData => ({
+    setFormData((prevData) => ({
       ...prevData,
-      category: e.target.value
-    }))
-  }
+      category: e.target.value,
+    }));
+  };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    onSubmit(formData)
-  }
+  const handleSubmit = async(e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+    await  updateProductById(product._id as string, formData)
+    onSuccess()
+    } catch (error) {
+      
+    }
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <FormLabel htmlFor="name">Name</FormLabel>
-        <Input id="name" name="name" value={formData.name} onChange={handleChange} required />
+        <Input 
+          id="name" 
+          name="name" 
+          value={formData.name} 
+          onChange={handleChange} 
+          required 
+        />
       </div>
       <div>
         <FormLabel htmlFor="category">Category</FormLabel>
-        <Select id="category" name="category" value={formData.category} onChange={handleCategoryChange} placeholder="Select category">
-          {['Furniture', 'Lighting', 'Electronics', 'Clothing', 'Books', 'Other'].map((category) => (
-            <option key={category} value={category}>
-              {category}
+        <Select 
+          id="category" 
+          name="category" 
+          value={formData.category} 
+          onChange={handleCategoryChange} 
+          placeholder="Select category"
+        >
+          {allCategory.map((category) => (
+            <option key={category} value={category.categoryName}>
+              {category.categoryName}
             </option>
           ))}
         </Select>
       </div>
       <div>
         <FormLabel htmlFor="price">Price</FormLabel>
-        <Input id="price" name="price" type="number" value={formData.price} onChange={handleChange} required />
+        <Input 
+          id="price" 
+          name="price" 
+          type="text" 
+          value={formData.price} 
+          onChange={handleChange} 
+          required 
+        />
       </div>
       <div>
         <FormLabel htmlFor="desc">Description</FormLabel>
-        <Input id="desc" name="desc" value={formData.desc} onChange={handleChange} required />
+        <Input 
+          id="desc" 
+          name="desc" 
+          value={formData.desc} 
+          onChange={handleChange} 
+          required 
+        />
+      </div>
+      <div>
+        <FormLabel htmlFor="quantity">Quantity</FormLabel>
+        <Input 
+          id="quantity" 
+          name="quantity" 
+          type="number" 
+          value={formData.quantity} 
+          onChange={handleChange} 
+          required 
+        />
       </div>
       <Button colorScheme="blue" type="submit">
         Update Product
       </Button>
     </form>
-  )
+  );
 }
+
+

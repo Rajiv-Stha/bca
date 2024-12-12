@@ -14,20 +14,20 @@ export default function Navbar() {
   const { state: { user } } = useContext(ThriftContext)
 
   return (
-    <nav className="bg-white shadow-lg">
+    <nav className="  bg-white shadow-lg ">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
             <div className="flex-shrink-0">
               <Link to="/" className="flex items-center">
                 <img
-                  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRwdEEO-mCKk-1ZV-y9xarZawuakiH4VY381g&s"
+                  src="/images/logo2.png"
                   alt="Second Hand Store Logo"
                   width={40}
                   height={40}
-                  className="h-8 w-auto"
+                  className="h-20  0 w-auto"
                 />
-                <span className="ml-2 text-gray-900 font-semibold text-lg">Second Hand Store</span>
+                <span className="ml-2 text-green-900 font-semibold text-lg">Second Hand Store</span>
               </Link>
             </div>
             <div className="hidden md:block">

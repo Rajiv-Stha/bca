@@ -10,14 +10,11 @@ const Footer = () => {
       <h3 className="text-sm font-semibold text-gray-400 tracking-wider uppercase">
         About Us
       </h3>
-      <ul className="mt-4 space-y-4">
+      <ul className="mt-4 space-y-4 text-base text-gray-300 hover:text-white">
         <li>
-          <a
-            href="/our-story"
-            className="text-base text-gray-300 hover:text-white"
-          >
+          <Link to={"/about"}>
             Our Story
-          </a>
+          </Link>
         </li>
         <li>
           <a

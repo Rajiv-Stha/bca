@@ -16,8 +16,19 @@ const Signup = () => {
   const [errors, setErrors] = useState({
     username: "",
     password: "",
+    email:"",
   });
+  const validateEmail = (email: string) => {
+    // Email regex to ensure it doesn't start with special characters and ends with @gmail.com
+    const emailRegex = /^[A-Za-z0-9][A-Za-z0-9._%+-]*@gmail\.com$/;
+    if (!emailRegex.test(email)) {
+      return "Invalid email address. Email must not start with special characters and must end with '@gmail.com'.";
+    }
+    return "";
+  };
+  
 
+  
   const validateUsername = (username: string) => {
     const usernameRegex = /^[A-Za-z][A-Za-z0-9_]{2,}$/; // Start with alphabet and at least 3 characters
     if (!usernameRegex.test(username)) {
@@ -52,12 +63,14 @@ const Signup = () => {
 
   const handleSignUp = async (event: SyntheticEvent) => {
     event.preventDefault();
-
+    const emailError = validateEmail(signUpData.email)
+    console.log(emailError);
     const usernameError = validateUsername(signUpData.username);
     const passwordError = validatePassword(signUpData.password);
 
-    if (usernameError || passwordError) {
+    if (usernameError || passwordError || emailError) {
       setErrors({
+        email: emailError,
         username: usernameError,
         password: passwordError,
       });
@@ -112,6 +125,7 @@ const Signup = () => {
                 placeholder="Enter your email address"
                 name="email"
               />
+              {errors.email && <p className={styles.error_text}>{errors.email}</p>}
             </div>
           </div>
 

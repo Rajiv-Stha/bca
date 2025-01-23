@@ -21,11 +21,27 @@ import { TupdateProuductPayload } from '../../utils/api'
 
 import { ProductType } from '../../utils/Type'
 import Navbar from '../../components/Navbar/Navbar'
+import axiosInstance from '../../utils/axios'
+interface Product {
+  _id: string;
+  name: string;
+  desc: string;
+  owner: string;
+  image: string;
+  price: string;
+  status: "pending" | "approved" | "rejected";
+  category: string;
+  quantity: number;
+  gender: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 export default function MyProducts() {
   const [products, setProducts] = useState<ProductType[]>([])
   const [editingProduct, setEditingProduct] = useState<ProductType | null>(null)
   const { isOpen, onOpen, onClose } = useDisclosure()
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
 
   const { state: { user } } = useContext(ThriftContext)
 const fetchProduct = ()=>{
@@ -44,10 +60,16 @@ const fetchProduct = ()=>{
    fetchProduct()
   }, [user]);
 
-  const handleDelete = (id: string) => {
-    setProducts(products.filter(product => product._id !== id))
-  }
+  // const handleDelete = (id: string) => {
+  //   setProducts(products.filter(product => product._id !== id))
+  // }
+  const handleDelete = async (id: string) => {
+    const response = await axiosInstance.delete(`/product/${id}`);
 
+    if (response.status === 200) {
+      setAllProducts(allProducts.filter((product) => product._id !== id));
+    }
+  };
   
 
   return (
